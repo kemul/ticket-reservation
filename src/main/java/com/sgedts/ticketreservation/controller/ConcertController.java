@@ -29,7 +29,6 @@ public class ConcertController {
     public List<Concert> searchConcerts(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String date) {
-        System.out.println("[Controller]search " + search);
         return concertService.searchConcerts(search, date);
     }
 }
