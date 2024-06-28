@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -22,5 +23,13 @@ public class ConcertController {
     public List<Concert> getUpcomingConcerts() {
         System.out.println("Upcoming Concert.....");
         return concertService.getUpcomingConcerts();
+    }
+
+    @GetMapping("/search")
+    public List<Concert> searchConcerts(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String date) {
+        System.out.println("[Controller]search " + search);
+        return concertService.searchConcerts(search, date);
     }
 }

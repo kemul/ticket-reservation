@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ConcertRepository extends JpaRepository<Concert, Long> {
+public interface ConcertRepository extends JpaRepository<Concert, Long>, CustomConcertRepository {
 
     @Query("SELECT c FROM Concert c WHERE c.concertDate > current_timestamp AND c.availableTickets > 0")
     List<Concert> findUpcomingConcerts();
