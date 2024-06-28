@@ -7,5 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TicketReservationApplication {
     public static void main(String[] args) {
         SpringApplication.run(TicketReservationApplication.class, args);
+        System.out.println("Hellllooooo Springgg.....");
     }
 }
