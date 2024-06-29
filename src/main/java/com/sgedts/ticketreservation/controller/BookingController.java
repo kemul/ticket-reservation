@@ -19,13 +19,6 @@ public class BookingController {
             @RequestParam Long userId,
             @RequestParam Long concertId,
             @RequestParam int numberOfTickets) {
-        try {
-            System.out.printf("[Controller] bookTicket %d:%d ", userId, concertId);
-            return bookingService.bookTicket(userId, concertId, numberOfTickets);
-        } catch (ResponseStatusException e) {
-            throw e; // Re-throw the custom exceptions
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
-        }
+        return bookingService.bookTicket(userId, concertId, numberOfTickets);
     }
 }

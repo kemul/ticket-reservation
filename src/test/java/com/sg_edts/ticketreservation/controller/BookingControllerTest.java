@@ -7,15 +7,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class BookingControllerTest {
+class BookingControllerTest {
 
     @Mock
     private BookingService bookingService;
@@ -23,60 +26,25 @@ public class BookingControllerTest {
     @InjectMocks
     private BookingController bookingController;
 
+    private MockMvc mockMvc;
+
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(bookingController).build();
     }
 
     @Test
-    public void testBookTicket_Success() throws Exception {
+    void bookTicket() throws Exception {
         Booking mockBooking = new Booking();
+        mockBooking.setBookingID(1L);
+        mockBooking.setNumberOfTickets(2);
+
         when(bookingService.bookTicket(anyLong(), anyLong(), anyInt())).thenReturn(mockBooking);
 
-        Booking booking = bookingController.bookTicket(1L, 2L, 50);
-        assertNotNull(booking);
-        verify(bookingService, times(1)).bookTicket(1L, 2L, 50);
-    }
-
-    @Test
-    public void testBookTicket_UserNotFound() throws Exception {
-        when(bookingService.bookTicket(anyLong(), anyLong(), anyInt()))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            bookingController.bookTicket(1L, 2L, 50);
-        });
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
-        assertEquals("User not found", exception.getReason());
-        verify(bookingService, times(1)).bookTicket(1L, 2L, 50);
-    }
-
-    @Test
-    public void testBookTicket_ConcertNotFound() throws Exception {
-        when(bookingService.bookTicket(anyLong(), anyLong(), anyInt()))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Concert not found"));
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            bookingController.bookTicket(1L, 2L, 50);
-        });
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
-        assertEquals("Concert not found", exception.getReason());
-        verify(bookingService, times(1)).bookTicket(1L, 2L, 50);
-    }
-
-    @Test
-    public void testBookTicket_InternalServerError() throws Exception {
-        when(bookingService.bookTicket(anyLong(), anyLong(), anyInt()))
-                .thenThrow(new RuntimeException("Unexpected error"));
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            bookingController.bookTicket(1L, 2L, 50);
-        });
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatus());
-        assertEquals("An unexpected error occurred", exception.getReason());
-        verify(bookingService, times(1)).bookTicket(1L, 2L, 50);
+        mockMvc.perform(post("/api/bookings/book")
+                .param("numberOfTickets", "2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

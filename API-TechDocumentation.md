@@ -1,10 +1,10 @@
 # Ticket Reservation API Documentation
 
-### 1. Get Upcoming Concerts
+### 1. Get Upcoming Concerts Active
+
+### Request
 - **URL:** `http://localhost:8080/api/concerts/upcoming`
 - **Method:** GET
-
-### CURL Command
 
 ```bash
 curl --location 'http://localhost:8080/api/concerts/upcoming'
@@ -51,49 +51,12 @@ curl --location 'http://localhost:8080/api/concerts/upcoming'
     }
 ]
 ```
+### 2. Book Concert
 
-### 2. Search Concerts
-- **URL:** `http://localhost:8080/api/concerts/search`
-- **Method:** GET
-- **Query Parameters:**
-  - `search` (string, optional): Keyword to search concerts by title, artist, or venue.
-
-### CURL Command
-
-```bash
-curl --location 'http://localhost:8080/api/concerts/search?search=Night'
-```
-
-### Response
-
-#### Success Response
-
-- **Code:** 200 OK
-- **Content:** 
-
-```json
-[
-    {
-        "concertID": 2,
-        "concertName": "Jazz Night",
-        "concertDate": "2024-07-20T20:00:00",
-        "venue": "Arena B",
-        "totalTickets": 5000,
-        "availableTickets": 4947,
-        "bookingStartTime": "22:00:00",
-        "bookingEndTime": "23:59:00"
-    }
-]
-```
-
-### 3. Book Ticket
+### Request
 - **URL:** `http://localhost:8080/api/bookings/book`
 - **Method:** POST
 - **Content-Type:** `application/x-www-form-urlencoded`
-
-## Request
-
-### CURL Command
 
 ```bash
 curl --location 'http://localhost:8080/api/bookings/book' \
@@ -177,3 +140,38 @@ curl --location 'http://localhost:8080/api/bookings/book' \
     "error": "An unexpected error occurred"
 }
 ```
+
+### 3. Search Concerts
+- **URL:** `http://localhost:8080/api/concerts/search`
+- **Method:** GET
+- **Query Parameters:**
+  - `search` (string, optional): Keyword to search concerts by title, artist, or venue.
+
+### CURL Command
+
+```bash
+curl --location 'http://localhost:8080/api/concerts/search?search=Night'
+```
+
+### Response
+
+#### Success Response
+
+- **Code:** 200 OK
+- **Content:** 
+
+```json
+[
+    {
+        "concertID": 2,
+        "concertName": "Jazz Night",
+        "concertDate": "2024-07-20T20:00:00",
+        "venue": "Arena B",
+        "totalTickets": 5000,
+        "availableTickets": 4947,
+        "bookingStartTime": "22:00:00",
+        "bookingEndTime": "23:59:00"
+    }
+]
+```
+

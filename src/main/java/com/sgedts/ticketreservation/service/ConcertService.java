@@ -4,6 +4,7 @@ import com.sgedts.ticketreservation.model.Concert;
 import com.sgedts.ticketreservation.repository.ConcertRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.sgedts.ticketreservation.exception.ErrorException;
 
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -23,12 +24,19 @@ public class ConcertService {
     private EntityManager entityManager;
 
     public List<Concert> getUpcomingConcerts() {
-        return concertRepository.findUpcomingConcerts();
+        List<Concert> lConcerts = concertRepository.findUpcomingConcerts();
+        if (lConcerts.size() == 0) {
+            throw new ErrorException("Concert not found");
+        }
+        return lConcerts;
     }
 
     public List<Concert> searchConcerts(String search, String date) {
-        System.out.println("[Service]search " + search);
-        return concertRepository.searchConcerts(search, date);
+        List<Concert> lConcerts = concertRepository.searchConcerts(search, date);
+        if (lConcerts.size() == 0) {
+            throw new ErrorException("Concert not found");
+        }
+        return lConcerts;
     }
 
 }

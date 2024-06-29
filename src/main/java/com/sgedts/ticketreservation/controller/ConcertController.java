@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-// API to get available concert , TODO AddParam
-// Currently handle static query, TODO AddDynamicQuery
+// API to get available concert 
+// Currently handle static query
 @RestController
 @RequestMapping("/api/concerts")
 public class ConcertController {
@@ -21,7 +21,6 @@ public class ConcertController {
 
     @GetMapping("/upcoming")
     public List<Concert> getUpcomingConcerts() {
-        System.out.println("Upcoming Concert.....");
         return concertService.getUpcomingConcerts();
     }
 

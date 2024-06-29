@@ -1,8 +1,6 @@
 package com.sgedts.ticketreservation.service;
 
-import com.sgedts.ticketreservation.exception.BookingException;
-import com.sgedts.ticketreservation.exception.ConcertNotFoundException;
-import com.sgedts.ticketreservation.exception.UserNotFoundException;
+import com.sgedts.ticketreservation.exception.ErrorException;
 import com.sgedts.ticketreservation.model.Booking;
 import com.sgedts.ticketreservation.model.Concert;
 import com.sgedts.ticketreservation.model.User;
@@ -34,7 +32,7 @@ public class BookingService {
     private UserRepository userRepository;
 
     @Transactional
-    public Booking bookTicket(Long userId, Long concertId, int numberOfTickets) throws BookingException {
+    public Booking bookTicket(Long userId, Long concertId, int numberOfTickets) throws ErrorException {
         logger.info("Booking ticket for user: {}, concert: {}", userId, concertId);
         validateUser(userId);
         Concert concert = validateConcert(concertId, numberOfTickets);
@@ -48,36 +46,34 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    private void validateUser(Long userId) throws UserNotFoundException {
+    private void validateUser(Long userId) throws ErrorException {
         if (!userRepository.existsById(userId)) {
             logger.error("User not found: {}", userId);
-            throw new UserNotFoundException("User not found");
+            throw new ErrorException("User not found");
         }
     }
 
     private Concert validateConcert(Long concertId, int numberOfTickets)
-            throws ConcertNotFoundException, BookingException {
+            throws ErrorException {
         Optional<Concert> concertOpt = concertRepository.findById(concertId);
         if (!concertOpt.isPresent()) {
             logger.error("Concert not found: {}", concertId);
-            throw new ConcertNotFoundException("Concert not found");
+            throw new ErrorException("Concert not found");
         }
         Concert concert = concertOpt.get();
 
         if (concert.getAvailableTickets() < numberOfTickets) {
             logger.error("Not enough tickets available for concert: {}, requested: {}", concertId, numberOfTickets);
-            throw new BookingException("Not enough tickets available");
+            throw new ErrorException("Not enough tickets available");
         }
 
         return concert;
     }
 
-    private void validateBookingTime(Concert concert) throws BookingException {
+    private void validateBookingTime(Concert concert) throws ErrorException {
         LocalTime now = LocalTime.now();
         if (now.isBefore(concert.getBookingStartTime()) || now.isAfter(concert.getBookingEndTime())) {
-            // logger.error("Booking time is outside allowed window for concert: {}",
-            // concert.getConcertId());
-            throw new BookingException("Booking is only allowed between " + concert.getBookingStartTime() + " and "
+            throw new ErrorException("Booking is only allowed between " + concert.getBookingStartTime() + " and "
                     + concert.getBookingEndTime());
         }
     }
