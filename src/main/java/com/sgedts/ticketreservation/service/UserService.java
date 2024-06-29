@@ -4,6 +4,7 @@ import com.sgedts.ticketreservation.model.User;
 import com.sgedts.ticketreservation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.sgedts.ticketreservation.util.Constants;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +32,7 @@ public class UserService {
     public User updateUser(Long id, User userDetails) {
         Optional<User> userOptional = userRepository.findById(id);
         if (!userOptional.isPresent()) {
-            throw new RuntimeException("User not found with id " + id);
+            throw new RuntimeException(Constants.ERROR_USER_NOT_FOUND);
         }
 
         User user = userOptional.get();

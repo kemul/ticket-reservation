@@ -13,6 +13,7 @@ import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import com.sgedts.ticketreservation.util.Constants;
 
 @Service
 public class ConcertService {
@@ -26,7 +27,7 @@ public class ConcertService {
     public List<Concert> getUpcomingConcerts() {
         List<Concert> lConcerts = concertRepository.findUpcomingConcerts();
         if (lConcerts.size() == 0) {
-            throw new ErrorException("Concert not found");
+            throw new ErrorException(Constants.ERROR_CONCERT_NOT_FOUND);
         }
         return lConcerts;
     }
@@ -34,7 +35,7 @@ public class ConcertService {
     public List<Concert> searchConcerts(String search, String date) {
         List<Concert> lConcerts = concertRepository.searchConcerts(search, date);
         if (lConcerts.size() == 0) {
-            throw new ErrorException("Concert not found");
+            throw new ErrorException(Constants.ERROR_CONCERT_NOT_FOUND);
         }
         return lConcerts;
     }

@@ -3,19 +3,23 @@ package com.sgedts.ticketreservation.service;
 import com.sgedts.ticketreservation.exception.ErrorException;
 import com.sgedts.ticketreservation.model.Booking;
 import com.sgedts.ticketreservation.model.Concert;
-import com.sgedts.ticketreservation.model.User;
 import com.sgedts.ticketreservation.repository.BookingRepository;
 import com.sgedts.ticketreservation.repository.ConcertRepository;
 import com.sgedts.ticketreservation.repository.UserRepository;
+import com.sgedts.ticketreservation.util.Constants;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class BookingService {
@@ -31,19 +35,47 @@ public class BookingService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
+    @Value("${redis.lock.wait-time}")
+    private long waitTime;
+
+    @Value("${redis.lock.lease-time}")
+    private long leaseTime;
+
     @Transactional
     public Booking bookTicket(Long userId, Long concertId, int numberOfTickets) throws ErrorException {
-        logger.info("Booking ticket for user: {}, concert: {}", userId, concertId);
-        validateUser(userId);
-        Concert concert = validateConcert(concertId, numberOfTickets);
-        validateBookingTime(concert);
+        RLock lock = redissonClient.getLock(Constants.REDIS_LOCK_KEY_PREFIX + concertId);
+        try {
 
-        updateAvailableTickets(concert, numberOfTickets);
+            // Wait for x seconds and lease the lock for x seconds (default config 10s)
+            if (lock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS)) {
+                validateUser(userId);
 
-        Booking booking = createBooking(userId, concert, numberOfTickets);
+                // check concert avalability
+                Concert concert = validateConcert(concertId, numberOfTickets);
 
-        logger.info("Successfully booked ticket for user: {}, concert: {}", userId, concertId);
-        return bookingRepository.save(booking);
+                // validate allowed concert time
+                validateBookingTime(concert);
+
+                // validate allowed number of book ticket
+                updateAvailableTickets(concert, numberOfTickets);
+
+                // create booking process
+                Booking booking = createBooking(userId, concert, numberOfTickets);
+                return bookingRepository.save(booking);
+            } else {
+                throw new ErrorException("Could not acquire lock for booking, please try again.");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ErrorException("Thread was interrupted while trying to acquire lock");
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
     }
 
     private void validateUser(Long userId) throws ErrorException {
@@ -53,8 +85,7 @@ public class BookingService {
         }
     }
 
-    private Concert validateConcert(Long concertId, int numberOfTickets)
-            throws ErrorException {
+    private Concert validateConcert(Long concertId, int numberOfTickets) throws ErrorException {
         Optional<Concert> concertOpt = concertRepository.findById(concertId);
         if (!concertOpt.isPresent()) {
             logger.error("Concert not found: {}", concertId);
