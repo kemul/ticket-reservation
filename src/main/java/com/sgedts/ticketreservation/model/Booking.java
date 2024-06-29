@@ -12,11 +12,11 @@ public class Booking {
     @Column(name = "booking_id", nullable = false)
     private Long bookingID;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "concert_id", nullable = false)
     private Concert concert;
 
