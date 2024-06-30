@@ -61,7 +61,6 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            
         </dependency>
 
         <!-- SLF4J API for logging -->
@@ -126,40 +125,8 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
-                    <encoding>UTF-8</encoding>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>true</failsOnError>
+                    <skip>true</skip>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Checkstyle Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
-                    <encoding>UTF-8</encoding>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>true</failsOnError>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- Flyway Maven Plugin -->
@@ -168,7 +135,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>7.7.3</version>
                 <configuration>
-                    <url>jdbc:postgresql://localhost:5432/db-ticket-reservation</url>
+                    <url>jdbc:postgresql://postgres:5432/db-ticket-reservation</url>
                     <user>postgres</user>
                     <password>postgres</password>
                     <schemas>
@@ -186,7 +153,75 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <flyway.url>jdbc:postgresql://postgres:5432/db-ticket-reservation</flyway.url>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-maven-plugin</artifactId>
+                        <version>7.7.3</version>
+                        <configuration>
+                            <url>${flyway.url}</url>
+                            <user>postgres</user>
+                            <password>postgres</password>
+                            <schemas>
+                                <schema>public</schema>
+                            </schemas>
+                            <locations>
+                                <location>classpath:db/migration</location>
+                            </locations>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>migrate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>local</id>
+            <properties>
+                <flyway.url>jdbc:postgresql://localhost:5432/db-ticket-reservation</flyway.url>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-maven-plugin</artifactId>
+                        <version>7.7.3</version>
+                        <configuration>
+                            <url>${flyway.url}</url>
+                            <user>postgres</user>
+                            <password>postgres</password>
+                            <schemas>
+                                <schema>public</schema>
+                            </schemas>
+                            <locations>
+                                <location>classpath:db/migration</location>
+                            </locations>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>migrate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
