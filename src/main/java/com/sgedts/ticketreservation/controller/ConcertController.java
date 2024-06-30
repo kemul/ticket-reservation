@@ -1,5 +1,6 @@
 package com.sgedts.ticketreservation.controller;
 
+import com.sgedts.ticketreservation.exception.ErrorException;
 import com.sgedts.ticketreservation.model.Concert;
 import com.sgedts.ticketreservation.service.ConcertService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,12 @@ public class ConcertController {
 
     @GetMapping(Constants.API_CONCERTS_UPCOMING)
     public List<Concert> getUpcomingConcerts() {
-        return concertService.getUpcomingConcerts();
+        List<Concert> lConcerts = concertService.getUpcomingConcerts();
+        System.out.println("Controller lConcerts Size" + lConcerts.size());
+        if (lConcerts.isEmpty()) {
+            throw new ErrorException(Constants.ERROR_CONCERT_NOT_FOUND);
+        }
+        return lConcerts;
     }
 
     @GetMapping(Constants.API_CONCERTS_SEARCH)
