@@ -58,6 +58,12 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            
+        </dependency>
+
         <!-- SLF4J API for logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -156,42 +162,30 @@
                 </executions>
             </plugin>
 
-            <!-- PMD Plugin -->
-            <!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.13.0</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
+            <!-- Flyway Maven Plugin -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>7.7.3</version>
                 <configuration>
-                    <rulesets>
-                        <ruleset>category/java/bestpractices.xml</ruleset>
-                        <ruleset>category/java/design.xml</ruleset>
-                        <ruleset>category/java/codestyle.xml</ruleset>
-                    </rulesets>
+                    <url>jdbc:postgresql://localhost:5432/db-ticket-reservation</url>
+                    <user>postgres</user>
+                    <password>postgres</password>
+                    <schemas>
+                        <schema>public</schema>
+                    </schemas>
+                    <locations>
+                        <location>classpath:db/migration</location>
+                    </locations>
                 </configuration>
-            </plugin> -->
-
-            <!-- SpotBugs Plugin -->
-            <!-- <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.2.3</version>
                 <executions>
                     <execution>
-                        <phase>validate</phase>
                         <goals>
-                            <goal>check</goal>
+                            <goal>migrate</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin> -->
+            </plugin>
 
         </plugins>
     </build>

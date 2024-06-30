@@ -26,7 +26,8 @@ public class ConcertService {
 
     public List<Concert> getUpcomingConcerts() {
         List<Concert> lConcerts = concertRepository.findUpcomingConcerts();
-        if (lConcerts.size() == 0) {
+        System.out.println("Service lConcerts Size" + lConcerts.size());
+        if (lConcerts.isEmpty()) {
             throw new ErrorException(Constants.ERROR_CONCERT_NOT_FOUND);
         }
         return lConcerts;
@@ -34,7 +35,7 @@ public class ConcertService {
 
     public List<Concert> searchConcerts(String search, String date) {
         List<Concert> lConcerts = concertRepository.searchConcerts(search, date);
-        if (lConcerts.size() == 0) {
+        if (lConcerts.isEmpty()) {
             throw new ErrorException(Constants.ERROR_CONCERT_NOT_FOUND);
         }
         return lConcerts;

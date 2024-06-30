@@ -5,7 +5,6 @@ import com.sgedts.ticketreservation.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import com.sgedts.ticketreservation.util.Constants;
 
 @RestController
