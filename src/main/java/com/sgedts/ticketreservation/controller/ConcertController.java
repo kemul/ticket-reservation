@@ -22,7 +22,6 @@ public class ConcertController {
     @GetMapping(Constants.API_CONCERTS_UPCOMING)
     public List<Concert> getUpcomingConcerts() {
         List<Concert> lConcerts = concertService.getUpcomingConcerts();
-        System.out.println("Controller lConcerts Size" + lConcerts.size());
         if (lConcerts.isEmpty()) {
             throw new ErrorException(Constants.ERROR_CONCERT_NOT_FOUND);
         }

@@ -7,28 +7,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+
 @Configuration
 public class RedissonConfig {
 
-    @Value("${redis.host}")
+    @Value("${spring.redis.host}")
     private String redisHost;
 
-    @Value("${redis.port}")
+    @Value("${spring.redis.port}")
     private int redisPort;
 
-    @Value("${redis.password:}") // Default to empty string if not set
-    private String redisPassword;
-
-    @Value("${redis.timeout:3000}")
-    private int redisTimeout;
+    @Value("${spring.redis.timeout}")
+    private Duration redisTimeout;
 
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
                 .setAddress("redis://" + redisHost + ":" + redisPort)
-                .setPassword(redisPassword.isEmpty() ? null : redisPassword)
-                .setTimeout(redisTimeout);
+                .setTimeout((int) redisTimeout.toMillis());
         return Redisson.create(config);
     }
 }
